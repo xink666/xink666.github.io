@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>love y</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+   }
+
+body {
+     min-height: 100vh;
+     font-family: "Microsoft Yahei",sans-serif;
+     background: linear-gradient(-45deg, #C6E3C8, #D2E9D5, #C6E3C8, #B7D89B, #DFF0D2);
+     background-size: 400% 400%;
+     animation: gradientMove 9s ease infinite;
+     }
+        
+@keyframes gradientMove 
+     {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+      }
+
+.mask {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+        }
+
+.popup {
+       width: 90%;
+       max-width: 400px;
+       padding: 35px 25px;
+       background: rgba(199, 226, 204, 0.35);
+       backdrop-filter: blur(16px);
+       -webkit-backdrop-filter: blur(16px);
+       border: 1px solid rgba(255, 255, 255, 0.6);
+       border-radius: 20px;
+       text-align: center;
+       box-shadow: 0 8px 32px rgba(143, 189, 141, 0.25);
+        }
+.popup h3 {
+       margin-bottom: 15px;
+       font-size: 20px;
+       color: #2c4b2c;
+          }
+
+.popup p {
+        font-size: 16px;
+        line-height: 1.8;
+        color: #333;
+         }
+
+.tip-mask {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.35);
+          justify-content: center;
+          align-items: center;
+          z-index: 20;
+          }
+.tip-box {
+         width: 90%;
+         max-width: 360px;
+         padding: 30px 25px;
+         background: rgba(255, 255, 255, 0.25);
+         backdrop-filter: blur(20px);
+         -webkit-backdrop-filter: blur(20px);
+         border: 1px solid rgba(255, 255, 255, 0.7);
+         border-radius: 22px;
+         box-shadow: 0 8px 36px rgba(130, 180, 128, 0.3);
+         text-align: center;
+         }
+
+.tip-box p {
+           font-size: 17px;
+           color: #2c4b2c;
+           line-height: 2;
+           margin-bottom: 25px;
+        }
+
+.close-btn {
+          padding: 10px 30px;
+          font-size: 15px;
+          border: none;
+          border-radius: 30px;
+          background: rgba(255, 255, 255, 0.28);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          border: 1px solid rgba(255, 255, 255, 0.65);
+          box-shadow: 0 4px 12px rgba(128, 175, 126, 0.22);
+          color: #2d4a2d;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          }
+.close-btn:active {
+          transform: scale(0.95);
+           }
+
+.player-wrap {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 450px;
+            padding: 20px;
+            background: rgba(221, 233, 204, 0.3);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            border-radius: 24px;
+            box-shadow: 0 8px 30px rgba(162, 212, 160, 0.2);
+            z-index: 5;
+        }
+
+.progress-container {
+            width: 100%;
+            margin-bottom: 18px;
+            }
+       
+.progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(176, 196, 159, 0.4);
+            border-radius: 10px;
+            cursor: default;
+            overflow: hidden;
+          }
+.progress-fill {
+            height: 100%;
+            background: #c5e0c3;
+            width: 0%;
+            border-radius: 10px;
+           }
+.time-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #445c44;
+            margin-top: 6px;
+            border: none;
+             }
+
+.btn-group {
+            display: flex;
+            gap: 12px;
+            }
+
+.btn-group button {
+            flex: 1;
+            padding: 12px 0;
+            font-size: 15px;
+            border: none;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 4px 15px rgba(128, 175, 126, 0.25),
+            inset 0 0 6px rgba(255, 255, 255, 0.3);
+            color: #2d4a2d;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+.btn-group button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+.btn-group button:active {
+            transform: scale(0.96);
+            box-shadow: 0 2px 8px rgba(128, 175, 126, 0.2);
+             }
+
+table {
+     width: 100%;
+     max-width: 500px;
+     margin: 20px auto;
+     border: none;
+        }
+
+td, th {
+       border: 1px solid #ccc;
+       padding: 8px;
+       text-align: center;
+       vertical-align: middle;
+       font-size: 60px;
+       border: none;
+        }
+
+.text{
+     color: #9BC6A8;
+         }
+
+.gradient-text {
+            background: linear-gradient(45deg, #E8F3E0, #D8ECC8 ,#C4E0AD ,#D8ECC8, #E8F3E0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            -webkit-text-fill-color: transparent;
+            font-size: 60px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+.marquee-wrap {
+           width: 100%;
+           overflow: hidden;
+           background: transparent;
+           margin: 20px 0;
+           }
+
+.marquee-text {
+           display: inline-block;
+           white-space: nowrap;
+           background: linear-gradient(to right, #8FB87A, #C6E3C8, #DFF0D2);
+           -webkit-background-clip: text;
+           background-clip: text;
+           color: transparent;
+           -webkit-text-fill-color: transparent;
+           font-size: 20px;
+           font-weight: bold;
+           animation: scroll 12s linear infinite;
+           }
+@keyframes scroll {
+           0% { transform: translateX(100%); }
+           100% { transform: translateX(-100%); }
+            }
+</style>
+</head>
+ <body>
+  <div class="mask" id="mask">
+    <div class="popup" id="popup">
+      <h3 class="text">温馨提示</h3>
+         <p class="text">
+                <span style="color: red;">你已进入神秘基地</span>
+                <br>
+                <span class="text">点击你的名字有惊喜哦</span>
+                <br>
+                😜😜
+                <br>
+                <span class="text">点击下面播放可以🎧</span>
+                <br>
+                <span class="text">点击空白区域即可关闭弹窗</span>
+         </p>
+      </div>
+    </div>
+
+    <div class="tip-mask" id="mask1">
+       <div class="tip-box">
+          <p>姚
+          <br>
+          要思雨
+          <br>
+          要思你
+          <br>
+          要想你
+          </p>
+         <button class="close-btn" id="close1">关闭</button>
+       </div>
+    </div>
+
+    <div class="tip-mask" id="mask2">
+       <div class="tip-box">
+           <p>思
+           <br>
+           思念
+           <br>
+           思你
+           <br>
+           想你
+           </p>
+           <button class="close-btn" id="close2">关闭</button>
+       </div>
+    </div>
+
+    <div class="tip-mask" id="mask3">
+        <div class="tip-box">
+            <p>雨
+            <br>
+            与
+            <br>
+            或许
+            <br>
+            ...
+            </p>
+            <button class="close-btn" id="close3">关闭</button>
+        </div>
+    </div>
+
+    <div class="player-wrap">
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+      <div class="time-display">
+         <span id="currentTime">00:00</span>
+         <span id="duration">00:00</span>
+      </div>
+    </div>
+        <div class="btn-group">
+            <button id="prevBtn">上一曲</button>
+            <button id="toggleBtn">播放</button>
+            <button id="nextBtn">下一曲</button>
+        </div>
+    </div>
+
+<table height="550" width="800" cellpadding="0" cellspacing="0" border="0" style="border: none;">
+ <tr>
+  <td class="gradient-text" id="word1">姚</td>
+ </tr>
+ <tr>
+  <td class="gradient-text" id="word2">思</td>
+ </tr>
+ <tr>
+  <td class="gradient-text" id="word3">雨</td>
+ </tr>
+ <tr>
+  <td style="font-size: 14px; border: none">
+      <marquee><span style="color: #8FB87A; border: none">I love you😘😘</span></marquee>
+  </td>
+ </tr>
+</table>
+
+    <audio id="bgm">
+    
+    <script>
+        const mask = document.getElementById('mask');
+        const toggleBtn = document.getElementById('toggleBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const bgm = document.getElementById('bgm');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const currentTimeEl = document.getElementById('currentTime');
+        const durationEl = document.getElementById('duration');
+
+        const mask1 = document.getElementById('mask1');
+        const mask2 = document.getElementById('mask2');
+        const mask3 = document.getElementById('mask3');
+        const close1 = document.getElementById('close1');
+        const close2 = document.getElementById('close2');
+        const close3 = document.getElementById('close3');
+
+        const word1 = document.getElementById('word1');
+        const word2 = document.getElementById('word2');
+        const word3 = document.getElementById('word3');
+
+        const musicList = [
+            "bgm.mp3",
+            "music2.mp3",
+            "music3.mp3"
+        ];
+        let currentIndex = 0;
+
+        function formatTime(time) {
+            if (isNaN(time)) return '00:00';
+            const minutes = Math.floor(time / 60);
+            const seconds = Math.floor(time % 60);
+            return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function loadMusic(index) {
+            bgm.src = musicList[index];
+            bgm.load();
+        }
+
+        loadMusic(currentIndex);
+
+        mask.addEventListener('click', function(e) {
+            if (e.target === mask) {
+                mask.style.display = 'none';
+            }
+        });
+
+        word1.addEventListener('click', () => mask1.style.display = 'flex');
+        close1.addEventListener('click', () => mask1.style.display = 'none');
+        mask1.addEventListener('click', e => {
+            if(e.target === mask1) mask1.style.display = 'none';
+        });
+
+        word2.addEventListener('click', () => mask2.style.display = 'flex');
+        close2.addEventListener('click', () => mask2.style.display = 'none');
+        mask2.addEventListener('click', e => {
+            if(e.target === mask2) mask2.style.display = 'none';
+        });
+
+        word3.addEventListener('click', () => mask3.style.display = 'flex');
+        close3.addEventListener('click', () => mask3.style.display = 'none');
+        mask3.addEventListener('click', e => {
+            if(e.target === mask3) mask3.style.display = 'none';
+        });
+
+        toggleBtn.addEventListener('click', function() {
+            if (bgm.paused) {
+                bgm.play();
+                toggleBtn.innerText = "暂停";
+            } else {
+                bgm.pause();
+                toggleBtn.innerText = "播放";
+            }
+        });
+
+        prevBtn.addEventListener('click', function() {
+            currentIndex--;
+            if (currentIndex < 0) currentIndex = musicList.length - 1;
+            loadMusic(currentIndex);
+            bgm.play();
+            toggleBtn.innerText = "暂停";
+        });
+
+        nextBtn.addEventListener('click', function() {
+            currentIndex++;
+            if (currentIndex >= musicList.length) currentIndex = 0;
+            loadMusic(currentIndex);
+            bgm.play();
+            toggleBtn.innerText = "暂停";
+        });
+
+        bgm.addEventListener('timeupdate', function() {
+            const current = bgm.currentTime;
+            const duration = bgm.duration || 0;
+            const percent = (current / duration) * 100;
+            progressFill.style.width = `${percent}%`;
+            currentTimeEl.textContent = formatTime(current);
+        });
+
+        bgm.addEventListener('loadedmetadata', function() {
+            durationEl.textContent = formatTime(bgm.duration);
+        });
+
+        bgm.addEventListener('ended', function() {
+            currentIndex++;
+            if (currentIndex >= musicList.length) currentIndex = 0;
+            loadMusic(currentIndex);
+            bgm.play();
+            toggleBtn.innerText = "暂停";
+        });
+    </script>
+ </body>
+</html>
